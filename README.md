@@ -80,7 +80,7 @@ Possible upgrades for the project:
 
 ## 👨‍💻 Author
 
-Created by **NesaPriyan**
+Created by **Nesapriyan.K**
 
 This project was built as a learning project to explore frontend development and web deployment.
 
