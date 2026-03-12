@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Keep Notes Clone</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<header>
+  <h1>Keep Notes</h1>
+
+  <!-- FEATURE 4: Better Search — wrapper with icon, clear btn, result counter -->
+  <div class="search-wrapper">
+    <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+    </svg>
+    <input type="text" id="search" placeholder="Search notes...">
+    <button class="search-clear" id="search-clear" onclick="clearSearch()" title="Clear">✕</button>
+    <span class="search-count" id="search-count"></span>
+  </div>
+</header>
+
+
+<!-- ══ ADD NOTE PANEL ══ -->
+<div class="add-note">
+  <div class="add-note-inner">
+
+    <input id="title" placeholder="Title">
+    <textarea id="content" placeholder="Take a note..."></textarea>
+
+    <!-- FEATURE 2: Note Colors — color palette picker -->
+    <div class="color-row">
+      <span class="color-row-label">Pick color</span>
+      <div class="color-options" id="color-options">
+        <button class="color-dot active" data-color="default" title="Default">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        </button>
+        <button class="color-dot" data-color="gold"   title="Gold"></button>
+        <button class="color-dot" data-color="coral"  title="Coral"></button>
+        <button class="color-dot" data-color="mint"   title="Mint"></button>
+        <button class="color-dot" data-color="violet" title="Violet"></button>
+        <button class="color-dot" data-color="sky"    title="Sky"></button>
+        <button class="color-dot" data-color="rose"   title="Rose"></button>
+      </div>
+    </div>
+
+    <button onclick="addNote()">Add Note</button>
+
+  </div>
+</div>
+
+
+<!-- ══ NOTES GRID ══ -->
+<div id="notes-container"></div>
+
+
+<!-- ══════════════════════════════════════════
+     FEATURE 1 — EDIT MODAL
+══════════════════════════════════════════ -->
+<div class="modal-overlay" id="edit-overlay" onclick="closeEditModal(event)">
+  <div class="modal" id="edit-modal" role="dialog" aria-modal="true" aria-label="Edit Note">
+
+    <div class="modal-header">
+      <h2 class="modal-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+        Edit Note
+      </h2>
+      <button class="modal-close" onclick="closeEditModal()" title="Close">✕</button>
+    </div>
+
+    <!-- Color picker inside edit modal -->
+    <div class="color-row modal-colors">
+      <span class="color-row-label">Color</span>
+      <div class="color-options" id="edit-color-options">
+        <button class="color-dot active" data-color="default" title="Default">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        </button>
+        <button class="color-dot" data-color="gold"   title="Gold"></button>
+        <button class="color-dot" data-color="coral"  title="Coral"></button>
+        <button class="color-dot" data-color="mint"   title="Mint"></button>
+        <button class="color-dot" data-color="violet" title="Violet"></button>
+        <button class="color-dot" data-color="sky"    title="Sky"></button>
+        <button class="color-dot" data-color="rose"   title="Rose"></button>
+      </div>
+    </div>
+
+    <input    class="modal-input"    id="edit-title"   placeholder="Title">
+    <textarea class="modal-textarea" id="edit-content" placeholder="Note content..."></textarea>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+      <button class="btn-save"   onclick="saveEdit()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save Changes
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     FEATURE 3 — DELETE CONFIRMATION MODAL
+══════════════════════════════════════════ -->
+<div class="modal-overlay" id="delete-overlay" onclick="closeDeleteModal(event)">
+  <div class="modal modal-sm" id="delete-modal" role="dialog" aria-modal="true" aria-label="Confirm Delete">
+
+    <div class="delete-icon-wrap">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+        <polyline points="3 6 5 6 21 6"/>
+        <path d="M19 6l-1 14H6L5 6"/>
+        <path d="M10 11v6M14 11v6"/>
+        <path d="M9 6V4h6v2"/>
+      </svg>
+    </div>
+
+    <h2 class="modal-title">Delete this note?</h2>
+    <p class="delete-msg">This will permanently remove the note.<br>You can't undo this action.</p>
+
+    <div class="modal-actions">
+      <button class="btn-cancel"  onclick="closeDeleteModal()">Keep It</button>
+      <button class="btn-danger"  id="confirm-delete-btn" onclick="confirmDelete()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        Yes, Delete
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+<script src="script.js"></script>
+</body>
+</html>
